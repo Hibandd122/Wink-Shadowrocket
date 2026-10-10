@@ -36,12 +36,13 @@ class WinkQuotaBypass:
 
     def response(self, flow: http.HTTPFlow) -> None:
         url = flow.request.pretty_url
+        host = flow.request.pretty_host
 
         if not flow.response or not flow.response.content:
             return
 
-        # Chỉ can thiệp các domain meitu.com
-        if "meitu.com" not in flow.request.pretty_host:
+        # Can thiep ca meitu.com va meitumv.com
+        if "meitu.com" not in host and "meitumv.com" not in host and "meitudata.com" not in host:
             return
 
         try:
@@ -51,6 +52,39 @@ class WinkQuotaBypass:
             return
 
         modified = False
+
+        # 0. VESDK Feature Limits (VESDK Core Quota Engine cho Wink 3.18+)
+        if "/subscribe/func_limit_batch_query" in url:
+            if "response" in obj and "items" in obj["response"]:
+                for item in obj["response"]["items"]:
+                    item["limit_flag"] = 0        # 0 = Khong gioi han
+                    item["total_num"] = 9999
+                    item["free_num"] = 9999
+                    item["limit_type"] = 0
+                    item["use_num"] = 0
+                    item["can_share"] = 1
+                    item["preview_flag"] = 0
+                modified = True
+                print(f"[WinkQuota] [MOCKED UNLIMITED] VESDK Func Limits: {len(obj['response']['items'])} features")
+
+        # 0.1 Rights Package (Goi quyen loi nguoi dung cua Wink)
+        elif "/user/rights_package.json" in url:
+            obj["code"] = 0
+            if "data" not in obj or not isinstance(obj["data"], dict):
+                obj["data"] = {}
+            obj["data"]["rights_package"] = {
+                "in_use": 1,
+                "photo_free_total": 9999,
+                "photo_free_used": 0,
+                "photo_free_left": 9999,
+                "duration_free_total": 999999,
+                "duration_free_used": 0,
+                "duration_free_left": 999999,
+                "valid_days": 9999,
+                "remaining_days": 9999
+            }
+            modified = True
+            print(f"[WinkQuota] [MOCKED RIGHTS] User Rights Package set to 9999")
 
         # 2. Quota Check & Strategy Free -> Giả lập 999 lượt dùng thử
         if "/v2/function/user/check.json" in url or "/v2/function/strategy/free.json" in url:
