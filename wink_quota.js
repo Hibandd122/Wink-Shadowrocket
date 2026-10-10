@@ -102,21 +102,32 @@ else {
                 let accountType = origData.account_type || 2;
                 
                 obj.data = {
-                    account_id: accountId,
+                    account_id: String(accountId),
                     account_type: accountType,
                     is_vip: true,
+                    use_vip: true,
+                    active_sub_type: 2,
+                    active_sub_type_name: "VIP",
+                    sub_type: 2,
+                    sub_type_name: "VIP",
                     type: 2,
                     type_name: "SVIP",
-                    valid_time: 4102444800,
-                    invalid_time: 4102444800,
+                    valid_time: "1700000000000",
+                    invalid_time: "32495529599000",
+                    current_order_invalid_time: "32495508000000",
+                    expire_days: 99999,
                     have_valid_contract: true,
                     show_renew_flag: false,
                     show_renew_flag_abroad: false,
-                    use_vip: true,
                     in_trial_period: false,
                     in_grace_period: false,
-                    expire_days: 99999,
-                    limit_type: 0
+                    limit_type: 0,
+                    membership: {
+                        id: "4",
+                        display_name: "Wink SVIP",
+                        level: 1,
+                        level_name: "SVIP"
+                    }
                 };
                 console.log("[WinkQuota] [MOCKED VIP] " + url.split('?')[0]);
             }
