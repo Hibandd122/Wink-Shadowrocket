@@ -257,21 +257,24 @@ class WinkQuotaBypass:
             modified = True
             print(f"[WinkQuota] [MOCKED VIP] {url.split('?')[0]}")
 
-        # 5. Hợp đồng SVIP vĩnh viễn
-        elif "/v2/contract/sub/get_valid_contract.json" in url:
+        # 5. Hợp đồng SVIP vĩnh viễn (get_valid_contract & get_all_valid_contract)
+        elif "/v2/contract/sub/get_" in url:
             obj["code"] = 0
+            obj["error_code"] = "00000"
             obj["message"] = "success"
             obj["success"] = True
             obj["data"] = [{
-                "product_id": "com.meitu.wink.vip.year",
+                "product_id": "com.meitu.wink.autorenew.vip.year",
                 "order_id": "999999999999999",
                 "status": 1,
-                "start_time": 1700000000,
-                "end_time": 4102444800,
+                "start_time": "1700000000000",
+                "end_time": "32495529599000",
+                "valid_time": "1700000000000",
+                "invalid_time": "32495529599000",
                 "is_valid": True
             }]
             modified = True
-            print(f"[WinkQuota] [MOCKED] Valid Contract: {url}")
+            print(f"[WinkQuota] [MOCKED CONTRACT] {url.split('?')[0]}")
 
         # 6. Permission & Limit check
         elif "/v2/transaction/permission_check.json" in url:
