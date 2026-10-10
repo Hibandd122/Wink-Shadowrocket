@@ -163,6 +163,15 @@ class WinkQuotaBypass:
             modified = True
             print(f"[WinkQuota] [MOCKED ENTRANCE VIP] {url.split('?')[0]}")
 
+        # 0.4 Chặn Popup mời mua VIP (User Layer VIP Popup)
+        elif "/user_layer/vip_popup_product_brief.json" in url:
+            obj["code"] = 0
+            obj["message"] = "success"
+            obj["data"] = None
+            obj["success"] = True
+            modified = True
+            print(f"[WinkQuota] [BLOCKED POPUP] VIP purchase popup suppressed: {url.split('?')[0]}")
+
         # 2. Quota Check & Strategy Free -> Giả lập 999 lượt dùng thử
         if "/v2/function/user/check.json" in url or "/v2/function/strategy/free.json" in url:
             obj["code"] = 0
