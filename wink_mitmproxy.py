@@ -118,6 +118,51 @@ class WinkQuotaBypass:
             modified = True
             print(f"[WinkQuota] [MOCKED RIGHTS] User Rights Package set to 9999")
 
+        # 0.2 Meitu AI Tool Inits (Old Photo Repair, Image Repair, Super Resolution, etc.)
+        elif "/meitu_ai/" in url:
+            if "response" in obj and isinstance(obj["response"], dict):
+                r_ai = obj["response"]
+                r_ai["is_vip"] = True
+                if "func" in r_ai and isinstance(r_ai["func"], dict):
+                    r_ai["func"]["time_range"] = "forever"
+                    r_ai["func"]["total_num"] = 9999
+                    r_ai["func"]["vip_total_num"] = 9999
+                    r_ai["func"]["free_num"] = 9999
+                    r_ai["func"]["used_num"] = 0
+                if "right" in r_ai and isinstance(r_ai["right"], dict):
+                    r_ai["right"]["total_num"] = 9999
+                    r_ai["right"]["left_num"] = 9999
+                modified = True
+                print(f"[WinkQuota] [MOCKED AI TOOL] {url.split('?')[0]}")
+
+        # 0.3 User Info by Entrance
+        elif "/v2/user/info_by_entrance.json" in url:
+            obj["code"] = 0
+            obj["error_code"] = "00000"
+            obj["message"] = "success"
+            obj["success"] = True
+            if "data" not in obj or not isinstance(obj["data"], dict):
+                obj["data"] = {}
+            orig_vip = obj["data"].get("vip_info") or {}
+            obj["data"]["vip_info"] = {
+                "account_type": orig_vip.get("account_type", 2),
+                "account_id": str(orig_vip.get("account_id", "18834583572831305")),
+                "is_vip": True,
+                "use_vip": True,
+                "type": 2,
+                "type_name": "SVIP",
+                "valid_time": "1700000000000",
+                "invalid_time": "32495529599000",
+                "have_valid_contract": True,
+                "show_renew_flag": False,
+                "show_renew_flag_abroad": False,
+                "in_trial_period": False,
+                "in_grace_period": False,
+                "limit_type": 0
+            }
+            modified = True
+            print(f"[WinkQuota] [MOCKED ENTRANCE VIP] {url.split('?')[0]}")
+
         # 2. Quota Check & Strategy Free -> Giả lập 999 lượt dùng thử
         if "/v2/function/user/check.json" in url or "/v2/function/strategy/free.json" in url:
             obj["code"] = 0
