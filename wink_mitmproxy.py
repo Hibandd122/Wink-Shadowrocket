@@ -15,7 +15,7 @@ class WinkQuotaBypass:
     def request(self, flow: http.HTTPFlow) -> None:
         url = flow.request.pretty_url
 
-        # 1. Chặn lệnh trừ lượt Cloud Render & Tài khoản ảo
+        # 1. Chặn lệnh trừ lượt Cloud Render, Tài khoản ảo & VESDK Quota Consume
         if "/v2/function/user/consume.json" in url or "/v1/virtual/account/record/consume.json" in url:
             print(f"[WinkQuota] [BLOCKED] Request consume: {url}")
             mock_body = {
@@ -24,6 +24,28 @@ class WinkQuotaBypass:
                 "message": "success",
                 "data": {"consume_status": 1},
                 "success": True
+            }
+            flow.response = http.Response.make(
+                200,
+                json.dumps(mock_body).encode("utf-8"),
+                {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            )
+        elif "/subscribe/func_limit" in url and ("type=consume" in url or (flow.request.content and b"type=consume" in flow.request.content)):
+            print(f"[WinkQuota] [BLOCKED] VESDK consume request: {url}")
+            mock_body = {
+                "meta": {"code": 0, "msg": "", "error": "", "request_uri": "/subscribe/func_limit"},
+                "response": {
+                    "limit_flag": 0,
+                    "total_num": 9999,
+                    "free_num": 9999,
+                    "limit_type": 0,
+                    "use_num": 0,
+                    "can_share": 1,
+                    "preview_flag": 0
+                }
             }
             flow.response = http.Response.make(
                 200,
@@ -54,18 +76,28 @@ class WinkQuotaBypass:
         modified = False
 
         # 0. VESDK Feature Limits (VESDK Core Quota Engine cho Wink 3.18+)
-        if "/subscribe/func_limit_batch_query" in url:
-            if "response" in obj and "items" in obj["response"]:
-                for item in obj["response"]["items"]:
-                    item["limit_flag"] = 0        # 0 = Khong gioi han
-                    item["total_num"] = 9999
-                    item["free_num"] = 9999
-                    item["limit_type"] = 0
-                    item["use_num"] = 0
-                    item["can_share"] = 1
-                    item["preview_flag"] = 0
+        if "/subscribe/func_limit" in url:
+            if "response" in obj and isinstance(obj["response"], dict):
+                resp_data = obj["response"]
+                if "items" in resp_data and isinstance(resp_data["items"], list):
+                    for item in resp_data["items"]:
+                        item["limit_flag"] = 0        # 0 = Khong gioi han
+                        item["total_num"] = 9999
+                        item["free_num"] = 9999
+                        item["limit_type"] = 0
+                        item["use_num"] = 0
+                        item["can_share"] = 1
+                        item["preview_flag"] = 0
+                else:
+                    resp_data["limit_flag"] = 0
+                    resp_data["total_num"] = 9999
+                    resp_data["free_num"] = 9999
+                    resp_data["limit_type"] = 0
+                    resp_data["use_num"] = 0
+                    resp_data["can_share"] = 1
+                    resp_data["preview_flag"] = 0
                 modified = True
-                print(f"[WinkQuota] [MOCKED UNLIMITED] VESDK Func Limits: {len(obj['response']['items'])} features")
+                print(f"[WinkQuota] [MOCKED UNLIMITED] VESDK Func Limit: {url.split('?')[0]}")
 
         # 0.1 Rights Package (Goi quyen loi nguoi dung cua Wink)
         elif "/user/rights_package.json" in url:
