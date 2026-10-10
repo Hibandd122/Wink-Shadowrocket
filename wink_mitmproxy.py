@@ -94,25 +94,37 @@ class WinkQuotaBypass:
             modified = True
             print(f"[WinkQuota] [MOCKED] Products by function: {url}")
 
-        # 4. Mở khóa VIP Info & Login VIP Check
-        elif "/v2/user/vip_info.json" in url or "/v2/user/login_vip_check.json" in url:
+        # 4. Mở khóa VIP Info, VIP Info By Group & Login VIP Check
+        elif "/v2/user/vip_info" in url or "/v2/user/login_vip_check.json" in url:
             obj["code"] = 0
+            obj["error_code"] = "00000"
             obj["message"] = "success"
             obj["success"] = True
+            
+            # Giữ lại account_id gốc nếu có
+            orig_data = obj.get("data") or {}
+            account_id = orig_data.get("account_id", "18834583572831305")
+            account_type = orig_data.get("account_type", 2)
+            
             obj["data"] = {
+                "account_id": account_id,
+                "account_type": account_type,
                 "is_vip": True,
+                "use_vip": True,
                 "type": 2,
                 "type_name": "SVIP",
                 "valid_time": 4102444800,
                 "invalid_time": 4102444800,
                 "have_valid_contract": True,
-                "use_vip": True,
+                "show_renew_flag": False,
+                "show_renew_flag_abroad": False,
                 "in_trial_period": False,
+                "in_grace_period": False,
                 "expire_days": 99999,
                 "limit_type": 0
             }
             modified = True
-            print(f"[WinkQuota] [MOCKED] VIP Info: {url}")
+            print(f"[WinkQuota] [MOCKED VIP] {url.split('?')[0]}")
 
         # 5. Hợp đồng SVIP vĩnh viễn
         elif "/v2/contract/sub/get_valid_contract.json" in url:
