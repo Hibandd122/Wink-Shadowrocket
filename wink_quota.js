@@ -248,20 +248,23 @@ else {
                 console.log("[WinkQuota] [MOCKED VIP] " + url.split('?')[0]);
             }
 
-            // 4. Valid contracts
-            else if (url.includes("/v2/contract/sub/get_valid_contract.json")) {
+            // 4. Valid contracts (get_valid_contract & get_all_valid_contract)
+            else if (url.includes("/v2/contract/sub/get_")) {
                 obj.code = 0;
+                obj.error_code = "00000";
                 obj.message = "success";
                 obj.success = true;
                 obj.data = [{
-                    product_id: "com.meitu.wink.vip.year",
+                    product_id: "com.meitu.wink.autorenew.vip.year",
                     order_id: "999999999999999",
                     status: 1,
-                    start_time: 1700000000,
-                    end_time: 4102444800,
+                    start_time: "1700000000000",
+                    end_time: "32495529599000",
+                    valid_time: "1700000000000",
+                    invalid_time: "32495529599000",
                     is_valid: true
                 }];
-                console.log("[WinkQuota] [MOCKED] Contract for: " + url);
+                console.log("[WinkQuota] [MOCKED CONTRACT] " + url.split('?')[0]);
             }
 
             // 5. Permission Check & Login Limit Check
