@@ -101,27 +101,38 @@ class WinkQuotaBypass:
             obj["message"] = "success"
             obj["success"] = True
             
-            # Giữ lại account_id gốc nếu có
             orig_data = obj.get("data") or {}
             account_id = orig_data.get("account_id", "18834583572831305")
             account_type = orig_data.get("account_type", 2)
             
+            # Meitu dùng timestamp mili-giây (13 chữ số) -> tránh lỗi năm 1970
             obj["data"] = {
-                "account_id": account_id,
+                "account_id": str(account_id),
                 "account_type": account_type,
                 "is_vip": True,
                 "use_vip": True,
+                "active_sub_type": 2,
+                "active_sub_type_name": "VIP",
+                "sub_type": 2,
+                "sub_type_name": "VIP",
                 "type": 2,
                 "type_name": "SVIP",
-                "valid_time": 4102444800,
-                "invalid_time": 4102444800,
+                "valid_time": "1700000000000",
+                "invalid_time": "32495529599000",
+                "current_order_invalid_time": "32495508000000",
+                "expire_days": 99999,
                 "have_valid_contract": True,
                 "show_renew_flag": False,
                 "show_renew_flag_abroad": False,
                 "in_trial_period": False,
                 "in_grace_period": False,
-                "expire_days": 99999,
-                "limit_type": 0
+                "limit_type": 0,
+                "membership": {
+                    "id": "4",
+                    "display_name": "Wink SVIP",
+                    "level": 1,
+                    "level_name": "SVIP"
+                }
             }
             modified = True
             print(f"[WinkQuota] [MOCKED VIP] {url.split('?')[0]}")
