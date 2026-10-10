@@ -112,6 +112,50 @@ else {
                 };
                 console.log("[WinkQuota] [MOCKED RIGHTS] User Rights Package set to 9999");
             }
+            // 0.2 Meitu AI Tool Inits (Old Photo Repair, Image Repair, Super Resolution)
+            else if (url.includes("/meitu_ai/")) {
+                if (obj.response && typeof obj.response === "object") {
+                    obj.response.is_vip = true;
+                    if (obj.response.func && typeof obj.response.func === "object") {
+                        obj.response.func.time_range = "forever";
+                        obj.response.func.total_num = 9999;
+                        obj.response.func.vip_total_num = 9999;
+                        obj.response.func.free_num = 9999;
+                        obj.response.func.used_num = 0;
+                    }
+                    if (obj.response.right && typeof obj.response.right === "object") {
+                        obj.response.right.total_num = 9999;
+                        obj.response.right.left_num = 9999;
+                    }
+                }
+                console.log("[WinkQuota] [MOCKED AI TOOL] " + url.split('?')[0]);
+            }
+            // 0.3 User Info by Entrance
+            else if (url.includes("/v2/user/info_by_entrance.json")) {
+                obj.code = 0;
+                obj.error_code = "00000";
+                obj.message = "success";
+                obj.success = true;
+                if (!obj.data) obj.data = {};
+                let origVip = obj.data.vip_info || {};
+                obj.data.vip_info = {
+                    account_type: origVip.account_type || 2,
+                    account_id: String(origVip.account_id || "18834583572831305"),
+                    is_vip: true,
+                    use_vip: true,
+                    type: 2,
+                    type_name: "SVIP",
+                    valid_time: "1700000000000",
+                    invalid_time: "32495529599000",
+                    have_valid_contract: true,
+                    show_renew_flag: false,
+                    show_renew_flag_abroad: false,
+                    in_trial_period: false,
+                    in_grace_period: false,
+                    limit_type: 0
+                };
+                console.log("[WinkQuota] [MOCKED ENTRANCE VIP] " + url.split('?')[0]);
+            }
             // 1. Quota Check & Strategy Free (AI Repair, Super Resolution, Old Photo Repair)
             else if (url.includes("/v2/function/user/check.json") || url.includes("/v2/function/strategy/free.json")) {
                 obj.code = 0;
