@@ -37,6 +37,28 @@ if (typeof $response === "undefined") {
                 })
             }
         });
+    } else if (url.includes("/subscribe/func_limit") && (url.includes("type=consume") || (typeof $request.body === "string" && $request.body.includes("type=consume")))) {
+        console.log("[WinkQuota] [BLOCKED] VESDK consume request: " + url);
+        $done({
+            response: {
+                status: 200,
+                headers: { 
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                body: JSON.stringify({
+                    meta: { code: 0, msg: "", error: "", request_uri: "/subscribe/func_limit" },
+                    response: {
+                        limit_flag: 0,
+                        total_num: 9999,
+                        free_num: 9999,
+                        limit_type: 0,
+                        use_num: 0,
+                        can_share: 1,
+                        preview_flag: 0
+                    }
+                })
+            }
+        });
     } else {
         $done({});
     }
@@ -49,17 +71,27 @@ else {
             let obj = JSON.parse(body);
 
             // 0. VESDK Feature Limits (Core Quota Engine cho Wink 3.18+)
-            if (url.includes("/subscribe/func_limit_batch_query")) {
-                if (obj.response && Array.isArray(obj.response.items)) {
-                    obj.response.items.forEach(item => {
-                        item.limit_flag = 0;       // 0 = khong gioi han
-                        item.total_num = 9999;
-                        item.free_num = 9999;
-                        item.limit_type = 0;
-                        item.use_num = 0;
-                        item.can_share = 1;
-                        item.preview_flag = 0;
-                    });
+            if (url.includes("/subscribe/func_limit")) {
+                if (obj.response) {
+                    if (Array.isArray(obj.response.items)) {
+                        obj.response.items.forEach(item => {
+                            item.limit_flag = 0;       // 0 = khong gioi han
+                            item.total_num = 9999;
+                            item.free_num = 9999;
+                            item.limit_type = 0;
+                            item.use_num = 0;
+                            item.can_share = 1;
+                            item.preview_flag = 0;
+                        });
+                    } else if (typeof obj.response === "object") {
+                        obj.response.limit_flag = 0;
+                        obj.response.total_num = 9999;
+                        obj.response.free_num = 9999;
+                        obj.response.limit_type = 0;
+                        obj.response.use_num = 0;
+                        obj.response.can_share = 1;
+                        obj.response.preview_flag = 0;
+                    }
                 }
                 console.log("[WinkQuota] [MOCKED UNLIMITED] VESDK Func Limits");
             }
