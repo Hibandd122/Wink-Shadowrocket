@@ -90,24 +90,35 @@ else {
                 console.log("[WinkQuota] [MOCKED] Products by function for: " + url);
             }
 
-            // 3. User VIP Info & Login VIP Check (Bypass VIP tổng)
-            else if (url.includes("/v2/user/vip_info.json") || url.includes("/v2/user/login_vip_check.json")) {
+            // 3. User VIP Info & Login VIP Check (Bypass VIP tong & VIP by group)
+            else if (url.includes("/v2/user/vip_info") || url.includes("/v2/user/login_vip_check.json")) {
                 obj.code = 0;
+                obj.error_code = "00000";
                 obj.message = "success";
                 obj.success = true;
+                
+                let origData = obj.data || {};
+                let accountId = origData.account_id || "18834583572831305";
+                let accountType = origData.account_type || 2;
+                
                 obj.data = {
+                    account_id: accountId,
+                    account_type: accountType,
                     is_vip: true,
                     type: 2,
                     type_name: "SVIP",
                     valid_time: 4102444800,
                     invalid_time: 4102444800,
                     have_valid_contract: true,
+                    show_renew_flag: false,
+                    show_renew_flag_abroad: false,
                     use_vip: true,
                     in_trial_period: false,
+                    in_grace_period: false,
                     expire_days: 99999,
                     limit_type: 0
                 };
-                console.log("[WinkQuota] [MOCKED] VIP Info for: " + url);
+                console.log("[WinkQuota] [MOCKED VIP] " + url.split('?')[0]);
             }
 
             // 4. Valid contracts
