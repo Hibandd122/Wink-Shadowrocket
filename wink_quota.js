@@ -48,8 +48,40 @@ else {
         try {
             let obj = JSON.parse(body);
 
+            // 0. VESDK Feature Limits (Core Quota Engine cho Wink 3.18+)
+            if (url.includes("/subscribe/func_limit_batch_query")) {
+                if (obj.response && Array.isArray(obj.response.items)) {
+                    obj.response.items.forEach(item => {
+                        item.limit_flag = 0;       // 0 = khong gioi han
+                        item.total_num = 9999;
+                        item.free_num = 9999;
+                        item.limit_type = 0;
+                        item.use_num = 0;
+                        item.can_share = 1;
+                        item.preview_flag = 0;
+                    });
+                }
+                console.log("[WinkQuota] [MOCKED UNLIMITED] VESDK Func Limits");
+            }
+            // 0.1 User Rights Package
+            else if (url.includes("/user/rights_package.json")) {
+                obj.code = 0;
+                if (!obj.data) obj.data = {};
+                obj.data.rights_package = {
+                    in_use: 1,
+                    photo_free_total: 9999,
+                    photo_free_used: 0,
+                    photo_free_left: 9999,
+                    duration_free_total: 999999,
+                    duration_free_used: 0,
+                    duration_free_left: 999999,
+                    valid_days: 9999,
+                    remaining_days: 9999
+                };
+                console.log("[WinkQuota] [MOCKED RIGHTS] User Rights Package set to 9999");
+            }
             // 1. Quota Check & Strategy Free (AI Repair, Super Resolution, Old Photo Repair)
-            if (url.includes("/v2/function/user/check.json") || url.includes("/v2/function/strategy/free.json")) {
+            else if (url.includes("/v2/function/user/check.json") || url.includes("/v2/function/strategy/free.json")) {
                 obj.code = 0;
                 obj.error_code = "00000";
                 obj.message = "success";
