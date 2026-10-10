@@ -156,6 +156,14 @@ else {
                 };
                 console.log("[WinkQuota] [MOCKED ENTRANCE VIP] " + url.split('?')[0]);
             }
+            // 0.4 Chặn Popup mời mua VIP (User Layer VIP Popup)
+            else if (url.includes("/user_layer/vip_popup_product_brief.json")) {
+                obj.code = 0;
+                obj.message = "success";
+                obj.data = null;
+                obj.success = true;
+                console.log("[WinkQuota] [BLOCKED POPUP] VIP purchase popup suppressed");
+            }
             // 1. Quota Check & Strategy Free (AI Repair, Super Resolution, Old Photo Repair)
             else if (url.includes("/v2/function/user/check.json") || url.includes("/v2/function/strategy/free.json")) {
                 obj.code = 0;
