@@ -1,0 +1,37 @@
+#!name=Wink VIP & Unlimited Quota
+#!desc=Mở khóa vĩnh viễn AI Repair, Super Resolution, VIP quyền năng, không giới hạn lượt dùng và chặn quảng cáo cho ứng dụng Wink (Meitu).
+#!author=Hibandd122
+#!homepage=https://github.com/Hibandd122/Wink-Shadowrocket
+#!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Wink.png
+#!category=Crack & Tools
+
+[Rule]
+# Giữ kết nối upload ảnh/video/tài nguyên nguyên bản không qua giải mã MITM
+DOMAIN-KEYWORD,upload,DIRECT
+DOMAIN-KEYWORD,oss,DIRECT
+DOMAIN-SUFFIX,meitudata.com,DIRECT
+
+[Script]
+# 0. Chặn toàn bộ lệnh trừ lượt làm nét & consume
+WinkBlockConsume = type=http-request,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com|meitudata\.com)\/(v2\/function\/user\/consume|v1\/virtual\/account\/record\/consume|subscribe\/.*consume|subscribe\/.*rollback),script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 1. Mở khóa vĩnh viễn quyền làm nét chân dung / HD / AI Repair (9999 lượt)
+WinkSubscribe = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com|meitudata\.com)\/subscribe\/.*,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 2. Mở khóa số dư hạt đậu ảo (Meidou Coins 99999)
+WinkMeidou = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com|meitudata\.com)\/v1\/meidou\/.*,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 3. Chặn Popup mời mua gói VIP
+WinkBlockPopup = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com)\/user_layer\/vip_popup_product_brief\.json,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 4. Giữ luôn 999 lượt dùng thử miễn phí trong hàm check chiến lược
+WinkMockCheck = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com|meitudata\.com)\/v2\/function\/(user\/check|strategy\/free)\.json,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 5. Mở khóa quyền dùng thử tính năng
+WinkMockEntrance = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com|meitudata\.com)\/v2\/entrance\/products_by_function\.json,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+# 6. Mở khóa trạng thái VIP toàn diện & Hợp đồng VIP 2099
+WinkVipInfo = type=http-response,pattern=^https?:\/\/.*(meitu\.com|meitumv\.com)\/v2\/(user\/vip_info|user\/vip_info_by_group|contract\/sub\/get_valid_contract|transaction\/permission_check)\.json,script-path=https://raw.githubusercontent.com/Hibandd122/Wink-Shadowrocket/main/wink_quota.js,requires-body=1,max-size=0
+
+[MITM]
+hostname = %APPEND% api-sub.meitu.com, api-sub-backup.meitu.com, api-sub.meitumv.com, vesdk.meitu.com, vesdk.meitumv.com, api-winkcut.meitu.com, api-wink.meitumv.com, strategy.app.meitudata.com, api.wallet.meitu.com, sub.meitu.com
